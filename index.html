@@ -442,7 +442,7 @@
       </div>
 
       <div class="note">
-        <strong>Envoi des résultats :</strong> pour recevoir automatiquement les résultats, ajoute ton URL Google Apps Script dans la constante <code>WEBHOOK_URL</code> du code.
+        <strong>Envoi des résultats :</strong> à la fin du quiz, un bouton permettra d’ouvrir le formulaire Google déjà rempli avec le nom, le score, le pourcentage et la note.
       </div>
 
       <div class="btns">
@@ -567,6 +567,7 @@
       <div class="result-list" id="resultList"></div>
 
       <div class="btns">
+        <button class="primary" id="btnSendResult">📤 Envoyer le résultat</button>
         <button class="secondary" id="btnRestart">🔄 Recommencer</button>
       </div>
     </section>
@@ -575,7 +576,7 @@
   <script>
     // Colle ici l'URL de déploiement de ton Google Apps Script Web App
     // pour envoyer automatiquement les résultats dans Google Sheets.
-    const WEBHOOK_URL = "https://script.google.com/macros/s/AKfycbzRRgo1K7XYQGCbbtfrB7SqKfOPdaRX7PQCCcEbwnsa6_rHnLKDcAVc6nPyAdk2Dyx8yA/exec";
+    const GOOGLE_FORM_BASE_URL = "https://docs.google.com/forms/d/e/1FAIpQLSedmjIKeR9ABo4VduwrkUi60hLcf6aMdxz7lDpiv7ThZqHj8A/viewform?usp=pp_url";
 
     const questions = [
       {
@@ -743,6 +744,7 @@
     document.getElementById("btnNext").addEventListener("click", nextQuestion);
     document.getElementById("btnFinish").addEventListener("click", finishExam);
     document.getElementById("btnRestart").addEventListener("click", restartExam);
+    document.getElementById("btnSendResult").addEventListener("click", sendToGoogleForm);
 
     function validateProfile() {
       const nom = document.getElementById("nom").value.trim();
@@ -887,9 +889,7 @@
       document.getElementById("finalName").innerHTML = `<strong>${escapeHtml(payload.eleve.nom)}</strong>`;
       document.getElementById("finalScore").textContent = `${payload.score} / ${payload.total}`;
       document.getElementById("finalMessage").textContent = `Pourcentage : ${payload.pourcentage}% | Note : ${payload.note}`;
-      document.getElementById("sendStatus").textContent = WEBHOOK_URL
-        ? "Envoi du résultat en cours..."
-        : "Aucun webhook n’est configuré. Le plus simple est d’utiliser un Google Sheet comme tableau automatique, puis d’exporter ce tableau en Excel (.xlsx).";
+      document.getElementById("sendStatus").textContent = "Clique sur ‘Envoyer le résultat’ pour ouvrir le formulaire Google déjà rempli.";
 
       const resultList = document.getElementById("resultList");
       resultList.innerHTML = payload.reponses.map(item => `
@@ -904,37 +904,29 @@
     }
 
     function sendResults(payload) {
+      window.latestPayload = payload;
       const status = document.getElementById("sendStatus");
+      status.textContent = "Résultat prêt. Clique sur ‘Envoyer le résultat’ pour transmettre les données dans le tableau.";
+    }
 
-      if (!WEBHOOK_URL) {
-        status.textContent = "Aucun webhook n’est configuré. Le plus simple est d’utiliser un Google Sheet comme tableau automatique, puis d’exporter ce tableau en Excel (.xlsx).";
+    function sendToGoogleForm() {
+      const status = document.getElementById("sendStatus");
+      const payload = window.latestPayload;
+
+      if (!payload) {
+        status.textContent = "Aucun résultat à envoyer pour le moment.";
         return;
       }
 
-      try {
-        const params = new URLSearchParams({
-          nom: payload.eleve.nom || "",
-          score: String(payload.score ?? ""),
-          total: String(payload.total ?? ""),
-          pourcentage: String(payload.pourcentage ?? ""),
-          note: String(payload.note ?? ""),
-          dateSoumission: payload.dateSoumission || ""
-        });
+      const url = `${GOOGLE_FORM_BASE_URL}` +
+        `&entry.928637750=${encodeURIComponent(payload.eleve.nom || "")}` +
+        `&entry.1193751235=${encodeURIComponent(String(payload.score ?? ""))}` +
+        `&entry.446624033=${encodeURIComponent(String(payload.total ?? ""))}` +
+        `&entry.414858967=${encodeURIComponent(String(payload.pourcentage ?? ""))}` +
+        `&entry.1805346480=${encodeURIComponent(String(payload.note ?? ""))}`;
 
-        const img = new Image();
-        img.onload = () => {
-          status.textContent = "Résultat envoyé. Vérifie le Google Sheet dans quelques secondes.";
-        };
-        img.onerror = () => {
-          status.textContent = "Le score a été calculé, mais l’envoi automatique n’a pas abouti. Vérifie le script Google Apps Script.";
-        };
-        img.src = `${WEBHOOK_URL}?${params.toString()}`;
-
-        status.textContent = "Envoi du résultat en cours...";
-      } catch (error) {
-        console.error(error);
-        status.textContent = "Le score a été calculé, mais l’envoi automatique a échoué. Vérifie l’URL du webhook et le déploiement Apps Script.";
-      }
+      window.open(url, "_blank");
+      status.textContent = "Le formulaire Google s’est ouvert. Il suffit maintenant de cliquer sur ‘Envoyer’ dans le formulaire.";
     }
 
     function restartExam() {
