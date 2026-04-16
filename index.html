@@ -575,7 +575,7 @@
   <script>
     // Colle ici l'URL de déploiement de ton Google Apps Script Web App
     // pour envoyer automatiquement les résultats dans Google Sheets.
-    const WEBHOOK_URL = "https://script.google.com/macros/s/AKfycbyNZwvJVV_xW4u2EEFPtW-Z9dGJ_D2rzGIVf4s1RYLb-Noulqk7ufJpRVEos0GEUGLR8A/exec";
+    const WEBHOOK_URL = "https://script.google.com/macros/s/AKfycbzRRgo1K7XYQGCbbtfrB7SqKfOPdaRX7PQCCcEbwnsa6_rHnLKDcAVc6nPyAdk2Dyx8yA/exec";
 
     const questions = [
       {
@@ -903,7 +903,7 @@
       `).join("");
     }
 
-    async function sendResults(payload) {
+    function sendResults(payload) {
       const status = document.getElementById("sendStatus");
 
       if (!WEBHOOK_URL) {
@@ -912,14 +912,25 @@
       }
 
       try {
-        await fetch(WEBHOOK_URL, {
-          method: "POST",
-          mode: "no-cors",
-          headers: { "Content-Type": "text/plain;charset=utf-8" },
-          body: JSON.stringify(payload)
+        const params = new URLSearchParams({
+          nom: payload.eleve.nom || "",
+          score: String(payload.score ?? ""),
+          total: String(payload.total ?? ""),
+          pourcentage: String(payload.pourcentage ?? ""),
+          note: String(payload.note ?? ""),
+          dateSoumission: payload.dateSoumission || ""
         });
 
-        status.textContent = "Résultat envoyé. Si besoin, attends 2 à 5 secondes puis vérifie le Google Sheet.";
+        const img = new Image();
+        img.onload = () => {
+          status.textContent = "Résultat envoyé. Vérifie le Google Sheet dans quelques secondes.";
+        };
+        img.onerror = () => {
+          status.textContent = "Le score a été calculé, mais l’envoi automatique n’a pas abouti. Vérifie le script Google Apps Script.";
+        };
+        img.src = `${WEBHOOK_URL}?${params.toString()}`;
+
+        status.textContent = "Envoi du résultat en cours...";
       } catch (error) {
         console.error(error);
         status.textContent = "Le score a été calculé, mais l’envoi automatique a échoué. Vérifie l’URL du webhook et le déploiement Apps Script.";
@@ -945,4 +956,3 @@
   </script>
 </body>
 </html>
-
