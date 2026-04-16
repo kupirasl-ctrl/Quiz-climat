@@ -18,11 +18,8 @@
       --text: #183244;
       --muted: #5f7686;
       --border: #d8e8f0;
-      --danger: #d44c4c;
-      --ok: #2e8b57;
       --shadow: 0 16px 40px rgba(24, 50, 68, 0.12);
       --radius: 28px;
-      --radius-sm: 22px;
     }
 
     * { box-sizing: border-box; }
@@ -117,9 +114,7 @@
       font-size: 1.02rem;
     }
 
-    .muted {
-      color: var(--muted);
-    }
+    .muted { color: var(--muted); }
 
     label {
       display: block;
@@ -232,7 +227,7 @@
       font-weight: 800;
       font-size: 1.12rem;
       line-height: 1.35;
-      color: var(--leaf-dark);
+      color: #2e7d32;
       background: linear-gradient(90deg, #eef9ff, #f3fff1);
       position: relative;
     }
@@ -250,9 +245,7 @@
       font-weight: 800;
     }
 
-    .acc-item[open] summary::after {
-      content: "−";
-    }
+    .acc-item[open] summary::after { content: "−"; }
 
     .acc-content {
       padding: 18px 20px 20px 20px;
@@ -263,7 +256,7 @@
       padding: 7px 12px;
       border-radius: 999px;
       background: #ebf8ee;
-      color: var(--leaf-dark);
+      color: #2e7d32;
       font-weight: 800;
       font-size: 0.95rem;
       margin-bottom: 12px;
@@ -293,7 +286,7 @@
     .progress > div {
       height: 100%;
       width: 0%;
-      background: linear-gradient(90deg, var(--sun), var(--leaf), var(--sea));
+      background: linear-gradient(90deg, var(--sun), #66bb6a, var(--sea));
       transition: width 0.25s ease;
     }
 
@@ -574,8 +567,6 @@
   </div>
 
   <script>
-    // Colle ici l'URL de déploiement de ton Google Apps Script Web App
-    // pour envoyer automatiquement les résultats dans Google Sheets.
     const GOOGLE_FORM_BASE_URL = "https://docs.google.com/forms/d/e/1FAIpQLSedmjIKeR9ABo4VduwrkUi60hLcf6aMdxz7lDpiv7ThZqHj8A/viewform?usp=pp_url";
 
     const questions = [
@@ -719,6 +710,8 @@
       answers: Array(questions.length).fill(null),
       profile: null
     };
+
+    window.latestPayload = null;
 
     const screenHome = document.getElementById("screen-home");
     const screenRevision = document.getElementById("screen-revision");
@@ -889,7 +882,7 @@
       document.getElementById("finalName").innerHTML = `<strong>${escapeHtml(payload.eleve.nom)}</strong>`;
       document.getElementById("finalScore").textContent = `${payload.score} / ${payload.total}`;
       document.getElementById("finalMessage").textContent = `Pourcentage : ${payload.pourcentage}% | Note : ${payload.note}`;
-      document.getElementById("sendStatus").textContent = "Clique sur ‘Envoyer le résultat’ pour ouvrir le formulaire Google déjà rempli.";
+      document.getElementById("sendStatus").textContent = "Clique sur « Envoyer le résultat » pour ouvrir le formulaire Google déjà rempli.";
 
       const resultList = document.getElementById("resultList");
       resultList.innerHTML = payload.reponses.map(item => `
@@ -906,7 +899,7 @@
     function sendResults(payload) {
       window.latestPayload = payload;
       const status = document.getElementById("sendStatus");
-      status.textContent = "Résultat prêt. Clique sur ‘Envoyer le résultat’ pour transmettre les données dans le tableau.";
+      status.textContent = "Résultat prêt. Clique sur « Envoyer le résultat » pour ouvrir le formulaire Google.";
     }
 
     function sendToGoogleForm() {
@@ -918,7 +911,8 @@
         return;
       }
 
-      const url = `${GOOGLE_FORM_BASE_URL}` +
+      const url =
+        GOOGLE_FORM_BASE_URL +
         `&entry.928637750=${encodeURIComponent(payload.eleve.nom || "")}` +
         `&entry.1193751235=${encodeURIComponent(String(payload.score ?? ""))}` +
         `&entry.446624033=${encodeURIComponent(String(payload.total ?? ""))}` +
@@ -926,13 +920,14 @@
         `&entry.1805346480=${encodeURIComponent(String(payload.note ?? ""))}`;
 
       window.open(url, "_blank");
-      status.textContent = "Le formulaire Google s’est ouvert. Il suffit maintenant de cliquer sur ‘Envoyer’ dans le formulaire.";
+      status.textContent = "Le formulaire Google s’est ouvert. Clique maintenant sur « Envoyer » dans le formulaire.";
     }
 
     function restartExam() {
       state.current = 0;
       state.answers = Array(questions.length).fill(null);
       state.profile = null;
+      window.latestPayload = null;
       document.getElementById("nom").value = "";
       showScreen("home");
     }
