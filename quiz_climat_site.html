@@ -1,0 +1,950 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Quiz climat</title>
+  <style>
+    :root {
+      --sky: #dff4ff;
+      --grass: #ecfff4;
+      --sun: #ffd54f;
+      --sun-2: #ffb74d;
+      --sea: #4fc3f7;
+      --sea-dark: #1e88e5;
+      --leaf: #66bb6a;
+      --leaf-dark: #2e7d32;
+      --card: #ffffff;
+      --text: #183244;
+      --muted: #5f7686;
+      --border: #d8e8f0;
+      --danger: #d44c4c;
+      --ok: #2e8b57;
+      --shadow: 0 16px 40px rgba(24, 50, 68, 0.12);
+      --radius: 28px;
+      --radius-sm: 22px;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at 8% 12%, rgba(255, 213, 79, 0.35), transparent 18%),
+        radial-gradient(circle at 88% 14%, rgba(79, 195, 247, 0.22), transparent 18%),
+        linear-gradient(180deg, var(--sky), var(--grass));
+      min-height: 100vh;
+    }
+
+    .wrap {
+      max-width: 980px;
+      margin: 0 auto;
+      padding: 18px;
+    }
+
+    .hero {
+      position: relative;
+      overflow: hidden;
+      background: linear-gradient(135deg, #29b6f6 0%, #66bb6a 100%);
+      color: white;
+      border-radius: 32px;
+      padding: 28px 24px 74px 24px;
+      box-shadow: var(--shadow);
+      margin-bottom: 18px;
+      border: 2px solid rgba(255,255,255,0.35);
+    }
+
+    .hero h1 {
+      margin: 0 0 8px 0;
+      font-size: clamp(2.1rem, 5vw, 3.4rem);
+      line-height: 1.1;
+    }
+
+    .hero p {
+      margin: 0;
+      max-width: 720px;
+      font-size: 1.08rem;
+      line-height: 1.5;
+    }
+
+    .hero-icons {
+      position: absolute;
+      left: 22px;
+      bottom: 18px;
+      font-size: 2rem;
+      letter-spacing: 10px;
+      opacity: 0.95;
+    }
+
+    .sun {
+      position: absolute;
+      right: 22px;
+      top: 18px;
+      width: 74px;
+      height: 74px;
+      border-radius: 50%;
+      background: radial-gradient(circle, #fff59d 0%, var(--sun) 55%, var(--sun-2) 100%);
+      box-shadow: 0 0 0 10px rgba(255,255,255,0.10), 0 0 30px rgba(255, 213, 79, 0.45);
+    }
+
+    .card {
+      background: var(--card);
+      border: 2px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 22px;
+      margin-bottom: 16px;
+    }
+
+    .hidden { display: none !important; }
+
+    h2 {
+      margin: 0 0 10px 0;
+      font-size: 1.8rem;
+      line-height: 1.2;
+    }
+
+    h3 {
+      margin: 0 0 12px 0;
+      font-size: 1.45rem;
+      line-height: 1.35;
+    }
+
+    p, li {
+      line-height: 1.6;
+      font-size: 1.02rem;
+    }
+
+    .muted {
+      color: var(--muted);
+    }
+
+    label {
+      display: block;
+      font-weight: 800;
+      margin-bottom: 8px;
+      font-size: 1.05rem;
+    }
+
+    input[type="text"] {
+      width: 100%;
+      padding: 17px 18px;
+      border-radius: 18px;
+      border: 2px solid #cfe3ee;
+      font-size: 1.08rem;
+      background: #ffffff;
+      margin-bottom: 12px;
+    }
+
+    .btns {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 14px;
+    }
+
+    button {
+      border: none;
+      border-radius: 999px;
+      padding: 15px 22px;
+      font-size: 1.08rem;
+      font-weight: 800;
+      cursor: pointer;
+      transition: transform 0.15s ease, opacity 0.15s ease;
+      box-shadow: 0 10px 22px rgba(24, 50, 68, 0.11);
+      min-height: 56px;
+    }
+
+    button:hover { transform: translateY(-1px); }
+    button:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    .primary {
+      background: linear-gradient(135deg, var(--sea), var(--sea-dark));
+      color: white;
+    }
+
+    .secondary {
+      background: #eaf7ff;
+      color: var(--sea-dark);
+    }
+
+    .accent {
+      background: linear-gradient(135deg, var(--sun), var(--sun-2));
+      color: #5a3900;
+    }
+
+    .note {
+      padding: 16px 18px;
+      border-radius: 18px;
+      background: #fff8dd;
+      border: 2px solid #f2df8d;
+      font-size: 1rem;
+      margin-top: 10px;
+    }
+
+    .feature-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 12px;
+      margin-top: 16px;
+    }
+
+    .feature-box {
+      border-radius: 20px;
+      padding: 18px;
+      border: 2px solid #dbeaf2;
+      background: linear-gradient(180deg, #ffffff, #f4fbff);
+      min-height: 120px;
+    }
+
+    .feature-box .icon {
+      font-size: 1.8rem;
+      margin-bottom: 8px;
+    }
+
+    .feature-box strong {
+      display: block;
+      font-size: 1.08rem;
+      margin-bottom: 6px;
+      color: var(--sea-dark);
+    }
+
+    .accordion {
+      display: grid;
+      gap: 14px;
+      margin-top: 18px;
+    }
+
+    .acc-item {
+      overflow: hidden;
+      border-radius: 22px;
+      background: #ffffff;
+      border: 2px solid #dbe8ef;
+    }
+
+    .acc-item summary {
+      list-style: none;
+      cursor: pointer;
+      padding: 18px 20px;
+      padding-right: 56px;
+      font-weight: 800;
+      font-size: 1.12rem;
+      line-height: 1.35;
+      color: var(--leaf-dark);
+      background: linear-gradient(90deg, #eef9ff, #f3fff1);
+      position: relative;
+    }
+
+    .acc-item summary::-webkit-details-marker { display: none; }
+
+    .acc-item summary::after {
+      content: "+";
+      position: absolute;
+      right: 18px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 1.5rem;
+      color: var(--sea-dark);
+      font-weight: 800;
+    }
+
+    .acc-item[open] summary::after {
+      content: "−";
+    }
+
+    .acc-content {
+      padding: 18px 20px 20px 20px;
+    }
+
+    .mini-highlight {
+      display: inline-block;
+      padding: 7px 12px;
+      border-radius: 999px;
+      background: #ebf8ee;
+      color: var(--leaf-dark);
+      font-weight: 800;
+      font-size: 0.95rem;
+      margin-bottom: 12px;
+    }
+
+    .progress-wrap {
+      margin: 12px 0 18px;
+    }
+
+    .progress-label-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 8px;
+      font-weight: 700;
+      color: var(--muted);
+    }
+
+    .progress {
+      height: 18px;
+      background: #dcecf3;
+      border-radius: 999px;
+      overflow: hidden;
+      border: 2px solid #cfe3ee;
+    }
+
+    .progress > div {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, var(--sun), var(--leaf), var(--sea));
+      transition: width 0.25s ease;
+    }
+
+    .question-box {
+      border-radius: 26px;
+      border: 2px solid #d8e7ee;
+      background: linear-gradient(180deg, #ffffff, #f4fbff);
+      padding: 22px;
+      margin-top: 16px;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 7px 12px;
+      border-radius: 999px;
+      background: #e8f4fb;
+      color: var(--sea-dark);
+      font-size: 0.95rem;
+      font-weight: 800;
+      margin-bottom: 14px;
+    }
+
+    .options {
+      display: grid;
+      gap: 14px;
+      margin-top: 14px;
+    }
+
+    .option {
+      display: flex;
+      gap: 14px;
+      align-items: flex-start;
+      padding: 18px 16px;
+      border-radius: 22px;
+      border: 3px solid #d9e8ef;
+      background: #ffffff;
+      transition: border-color 0.15s ease, background 0.15s ease, transform 0.15s ease;
+      min-height: 76px;
+    }
+
+    .option:hover {
+      border-color: #8ecae6;
+      background: #f8fcff;
+      transform: translateY(-1px);
+    }
+
+    .option input {
+      margin-top: 4px;
+      transform: scale(1.35);
+      flex: 0 0 auto;
+    }
+
+    .option span {
+      font-size: 1.1rem;
+      line-height: 1.45;
+      font-weight: 700;
+    }
+
+    .legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 12px;
+    }
+
+    .legend-chip {
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: #eef7fb;
+      border: 2px solid #d6e8f1;
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--sea-dark);
+    }
+
+    .success-box {
+      background: linear-gradient(135deg, #f3fff8, #f6fcff);
+      border: 2px solid #d5ebe1;
+      border-radius: 24px;
+      padding: 20px;
+    }
+
+    .score {
+      font-size: 2.2rem;
+      font-weight: 900;
+      margin: 8px 0;
+      color: var(--sea-dark);
+    }
+
+    .result-list {
+      display: grid;
+      gap: 12px;
+      margin-top: 16px;
+    }
+
+    .result-item {
+      border: 2px solid #dbe8ef;
+      border-radius: 20px;
+      padding: 14px 16px;
+      background: white;
+    }
+
+    .small { font-size: 0.98rem; }
+
+    @media (max-width: 700px) {
+      .wrap { padding: 12px; }
+      .hero, .card { padding: 18px; }
+      .hero { padding-bottom: 68px; }
+      .sun { width: 58px; height: 58px; }
+      .hero-icons { font-size: 1.6rem; letter-spacing: 6px; }
+      h2 { font-size: 1.55rem; }
+      h3 { font-size: 1.25rem; }
+      .option span { font-size: 1.02rem; }
+      button { width: 100%; }
+      .progress-label-row { flex-direction: column; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <section class="hero">
+      <div class="sun" aria-hidden="true"></div>
+      <h1>Quiz sur le climat</h1>
+      <p>Une version très visuelle, avec de gros boutons, des questions claires et des thèmes faciles à ouvrir pour réviser.</p>
+      <div class="hero-icons" aria-hidden="true">☀️ ☁️ 🌍 🌿</div>
+    </section>
+
+    <section id="screen-home" class="card">
+      <h2>Bienvenue</h2>
+      <p>Écris le nom et le prénom de l’élève, puis choisis la partie entraînement ou la partie examen.</p>
+
+      <label for="nom">Nom et prénom</label>
+      <input id="nom" type="text" placeholder="Ex. Camille Dupont" />
+
+      <div class="feature-grid">
+        <div class="feature-box">
+          <div class="icon" aria-hidden="true">📘</div>
+          <strong>Partie entraînement</strong>
+          L’élève clique sur un thème pour revoir l’essentiel avec une explication courte.
+        </div>
+        <div class="feature-box">
+          <div class="icon" aria-hidden="true">📝</div>
+          <strong>Partie examen</strong>
+          Une question à la fois, avec de grosses réponses faciles à sélectionner.
+        </div>
+      </div>
+
+      <div class="note">
+        <strong>Envoi des résultats :</strong> pour recevoir automatiquement les résultats, ajoute ton URL Google Apps Script dans la constante <code>WEBHOOK_URL</code> du code.
+      </div>
+
+      <div class="btns">
+        <button class="secondary" id="btnRevision">📘 Partie entraînement</button>
+        <button class="primary" id="btnGoExam">📝 Partie examen</button>
+      </div>
+    </section>
+
+    <section id="screen-revision" class="card hidden">
+      <h2>Partie entraînement</h2>
+      <p class="muted">Clique sur un thème pour afficher la révision.</p>
+
+      <div class="accordion">
+        <details class="acc-item" open>
+          <summary>🌦️ Différence entre climat et météo</summary>
+          <div class="acc-content">
+            <span class="mini-highlight">À retenir</span>
+            <p><strong>La météo</strong>, c’est le temps qu’il fait aujourd’hui ou dans les prochains jours.</p>
+            <p><strong>Le climat</strong>, c’est le temps qu’il fait d’habitude dans une région pendant très longtemps.</p>
+          </div>
+        </details>
+
+        <details class="acc-item">
+          <summary>☀️ Pourquoi il fait plus chaud à l’équateur</summary>
+          <div class="acc-content">
+            <span class="mini-highlight">À retenir</span>
+            <p>À l’équateur, les rayons du Soleil arrivent plus directement.</p>
+            <p>Donc l’énergie est plus concentrée et il fait plus chaud.</p>
+            <p>Aux pôles, les rayons arrivent plus de côté, donc il fait plus froid.</p>
+          </div>
+        </details>
+
+        <details class="acc-item">
+          <summary>🌊 Le Gulf Stream</summary>
+          <div class="acc-content">
+            <span class="mini-highlight">À retenir</span>
+            <p>Le Gulf Stream est un courant marin.</p>
+            <p>Il transporte de l’eau chaude vers l’Europe.</p>
+            <p>Grâce à lui, les hivers sont plus doux chez nous.</p>
+          </div>
+        </details>
+
+        <details class="acc-item">
+          <summary>⛰️ La montagne</summary>
+          <div class="acc-content">
+            <span class="mini-highlight">À retenir</span>
+            <p>Quand on monte en altitude, il fait plus froid.</p>
+            <p>On perd environ <strong>0,8 °C tous les 100 mètres</strong>.</p>
+          </div>
+        </details>
+
+        <details class="acc-item">
+          <summary>🌍 Les 5 grands climats</summary>
+          <div class="acc-content">
+            <span class="mini-highlight">À retenir</span>
+            <p>Il y a cinq grands climats :</p>
+            <p><strong>tropical, désertique, maritime, continental et polaire</strong>.</p>
+          </div>
+        </details>
+
+        <details class="acc-item">
+          <summary>🫧 L’atmosphère</summary>
+          <div class="acc-content">
+            <span class="mini-highlight">À retenir</span>
+            <p>L’atmosphère est la couche de gaz autour de la Terre.</p>
+            <p>Elle aide à respirer, protège la Terre et garde une bonne température pour la vie.</p>
+          </div>
+        </details>
+
+        <details class="acc-item">
+          <summary>🔥 L’effet de serre naturel</summary>
+          <div class="acc-content">
+            <span class="mini-highlight">À retenir</span>
+            <p>Les gaz à effet de serre naturels gardent une partie de la chaleur autour de la Terre.</p>
+            <p>Sans eux, la Terre serait beaucoup plus froide.</p>
+          </div>
+        </details>
+      </div>
+
+      <div class="btns">
+        <button class="secondary" id="btnBackHome1">⬅️ Retour</button>
+        <button class="accent" id="btnStartExam1">✅ Commencer l’examen</button>
+      </div>
+    </section>
+
+    <section id="screen-exam" class="card hidden">
+      <h2>Partie examen</h2>
+      <p class="muted">Choisis une réponse, puis passe à la question suivante.</p>
+
+      <div class="legend">
+        <div class="legend-chip">📌 15 questions</div>
+        <div class="legend-chip">👀 Une question à la fois</div>
+        <div class="legend-chip">✅ Réponses à choisir</div>
+      </div>
+
+      <div class="progress-wrap">
+        <div class="progress-label-row">
+          <div id="progressText">Question 1 sur 15</div>
+          <div>Avancement</div>
+        </div>
+        <div class="progress"><div id="progressBar"></div></div>
+      </div>
+
+      <div id="questionContainer" class="question-box"></div>
+
+      <div class="btns">
+        <button class="secondary" id="btnPrev">⬅️ Question précédente</button>
+        <button class="primary" id="btnNext">➡️ Question suivante</button>
+        <button class="accent hidden" id="btnFinish">🏁 Valider l’examen</button>
+      </div>
+    </section>
+
+    <section id="screen-result" class="card hidden">
+      <h2>Résultat</h2>
+      <div class="success-box">
+        <div id="finalName"></div>
+        <div class="score" id="finalScore"></div>
+        <div id="finalMessage"></div>
+        <div id="sendStatus" class="note"></div>
+      </div>
+
+      <div class="result-list" id="resultList"></div>
+
+      <div class="btns">
+        <button class="secondary" id="btnRestart">🔄 Recommencer</button>
+      </div>
+    </section>
+  </div>
+
+  <script>
+    // Colle ici l'URL de déploiement de ton Google Apps Script Web App
+    // pour envoyer automatiquement les résultats dans Google Sheets.
+    const WEBHOOK_URL = "";
+
+    const questions = [
+      {
+        type: "qcm",
+        prompt: "Le climat, c’est quoi ?",
+        options: [
+          "Le temps qu’il fait d’habitude pendant de nombreuses années",
+          "Le temps qu’il fait aujourd’hui",
+          "Le bulletin météo"
+        ],
+        answer: 0,
+        explanation: "Le climat correspond au temps observé sur une longue période."
+      },
+      {
+        type: "vf",
+        prompt: "Vrai ou faux : la météo et le climat, c’est la même chose.",
+        options: ["Vrai", "Faux"],
+        answer: 1,
+        explanation: "La météo = court terme. Le climat = long terme."
+      },
+      {
+        type: "qcm",
+        prompt: "Pourquoi fait-il plus chaud à l’équateur ?",
+        options: [
+          "Les rayons du Soleil arrivent plus directement",
+          "Il y a moins de vent",
+          "Il y a plus de montagnes"
+        ],
+        answer: 0,
+        explanation: "Les rayons sont plus concentrés à l’équateur."
+      },
+      {
+        type: "qcm",
+        prompt: "Comment s’appelle le courant marin qui réchauffe l’Europe ?",
+        options: ["Le Gulf Stream", "Le jet stream", "Le vent du nord"],
+        answer: 0,
+        explanation: "Le Gulf Stream transporte de l’eau chaude."
+      },
+      {
+        type: "qcm",
+        prompt: "Le climat de la Belgique est :",
+        options: ["maritime", "polaire", "désertique"],
+        answer: 0,
+        explanation: "La Belgique a un climat maritime."
+      },
+      {
+        type: "qcm",
+        prompt: "En montagne, quand on monte de 100 m, la température :",
+        options: [
+          "baisse un peu",
+          "augmente beaucoup",
+          "reste la même"
+        ],
+        answer: 0,
+        explanation: "La température diminue avec l’altitude."
+      },
+      {
+        type: "qcm",
+        prompt: "Combien de grands climats existe-t-il ?",
+        options: ["3", "5", "10"],
+        answer: 1,
+        explanation: "Il y a 5 grands climats."
+      },
+      {
+        type: "qcm",
+        prompt: "La couche de gaz autour de la Terre s’appelle :",
+        options: ["l’atmosphère", "la mer", "le sol"],
+        answer: 0,
+        explanation: "C’est l’atmosphère."
+      },
+      {
+        type: "vf",
+        prompt: "Vrai ou faux : sans effet de serre naturel, la Terre serait très froide.",
+        options: ["Vrai", "Faux"],
+        answer: 0,
+        explanation: "Sans effet de serre, il ferait environ -18°C."
+      },
+      {
+        type: "qcm",
+        prompt: "Quel est un gaz à effet de serre ?",
+        options: ["Le méthane", "Le sable", "Le sel"],
+        answer: 0,
+        explanation: "Le méthane est un gaz à effet de serre."
+      },
+      {
+        type: "qcm",
+        prompt: "Pourquoi les océans influencent-ils le climat ?",
+        options: [
+          "Ils transportent la chaleur sur la Terre",
+          "Ils arrêtent le vent",
+          "Ils créent les montagnes"
+        ],
+        answer: 0,
+        explanation: "Les océans redistribuent la chaleur."
+      },
+      {
+        type: "qcm",
+        prompt: "En ville, il fait souvent plus chaud qu’à la campagne parce que :",
+        options: [
+          "Les bâtiments gardent la chaleur",
+          "Il y a plus de soleil",
+          "Il n’y a pas de vent"
+        ],
+        answer: 0,
+        explanation: "Les bâtiments accumulent la chaleur."
+      },
+      {
+        type: "qcm",
+        prompt: "Pourquoi fait-il plus froid aux pôles ?",
+        options: [
+          "Les rayons du Soleil sont moins concentrés",
+          "Il n’y a pas d’air",
+          "La Terre est plus loin du Soleil"
+        ],
+        answer: 0,
+        explanation: "Les rayons arrivent de manière oblique."
+      },
+      {
+        type: "qcm",
+        prompt: "Quel climat a très peu de pluie ?",
+        options: ["désertique", "tropical", "maritime"],
+        answer: 0,
+        explanation: "Le climat désertique reçoit très peu de précipitations."
+      },
+      {
+        type: "qcm",
+        prompt: "À quoi sert l’atmosphère ?",
+        options: [
+          "À protéger et garder la chaleur",
+          "À fabriquer les océans",
+          "À arrêter la rotation de la Terre"
+        ],
+        answer: 0,
+        explanation: "Elle protège la Terre et régule la température."
+      }
+    ];
+
+    const state = {
+      current: 0,
+      answers: Array(questions.length).fill(null),
+      profile: null
+    };
+
+    const screenHome = document.getElementById("screen-home");
+    const screenRevision = document.getElementById("screen-revision");
+    const screenExam = document.getElementById("screen-exam");
+    const screenResult = document.getElementById("screen-result");
+    const questionContainer = document.getElementById("questionContainer");
+    const progressText = document.getElementById("progressText");
+    const progressBar = document.getElementById("progressBar");
+
+    document.getElementById("btnRevision").addEventListener("click", () => {
+      if (!validateProfile()) return;
+      showScreen("revision");
+    });
+
+    document.getElementById("btnGoExam").addEventListener("click", () => {
+      if (!validateProfile()) return;
+      startExam();
+    });
+
+    document.getElementById("btnBackHome1").addEventListener("click", () => showScreen("home"));
+    document.getElementById("btnStartExam1").addEventListener("click", startExam);
+    document.getElementById("btnPrev").addEventListener("click", prevQuestion);
+    document.getElementById("btnNext").addEventListener("click", nextQuestion);
+    document.getElementById("btnFinish").addEventListener("click", finishExam);
+    document.getElementById("btnRestart").addEventListener("click", restartExam);
+
+    function validateProfile() {
+      const nom = document.getElementById("nom").value.trim();
+      if (!nom) {
+        alert("Merci d’indiquer le nom et le prénom de l’élève avant de continuer.");
+        return false;
+      }
+
+      state.profile = {
+        nom,
+        startedAt: new Date().toISOString()
+      };
+      return true;
+    }
+
+    function showScreen(screen) {
+      screenHome.classList.add("hidden");
+      screenRevision.classList.add("hidden");
+      screenExam.classList.add("hidden");
+      screenResult.classList.add("hidden");
+
+      if (screen === "home") screenHome.classList.remove("hidden");
+      if (screen === "revision") screenRevision.classList.remove("hidden");
+      if (screen === "exam") screenExam.classList.remove("hidden");
+      if (screen === "result") screenResult.classList.remove("hidden");
+    }
+
+    function startExam() {
+      if (!state.profile && !validateProfile()) return;
+      showScreen("exam");
+      state.current = 0;
+      renderQuestion();
+    }
+
+    function renderQuestion() {
+      const q = questions[state.current];
+      const saved = state.answers[state.current];
+      progressText.textContent = `Question ${state.current + 1} sur ${questions.length}`;
+      progressBar.style.width = `${((state.current + 1) / questions.length) * 100}%`;
+
+      let html = `<div class="badge">${labelType(q.type)}</div>`;
+      html += `<h3>${q.prompt}</h3>`;
+      html += `<div class="options">`;
+      q.options.forEach((option, index) => {
+        const checked = saved === index ? "checked" : "";
+        html += `
+          <label class="option">
+            <input type="radio" name="answer" value="${index}" ${checked} />
+            <span>${option}</span>
+          </label>
+        `;
+      });
+      html += `</div>`;
+
+      questionContainer.innerHTML = html;
+      updateButtons();
+    }
+
+    function labelType(type) {
+      if (type === "vf") return "Vrai / Faux";
+      return "QCM";
+    }
+
+    function saveCurrentAnswer() {
+      const checked = document.querySelector('input[name="answer"]:checked');
+      state.answers[state.current] = checked ? Number(checked.value) : null;
+    }
+
+    function prevQuestion() {
+      saveCurrentAnswer();
+      if (state.current > 0) {
+        state.current -= 1;
+        renderQuestion();
+      }
+    }
+
+    function nextQuestion() {
+      saveCurrentAnswer();
+      if (state.current < questions.length - 1) {
+        state.current += 1;
+        renderQuestion();
+      }
+    }
+
+    function updateButtons() {
+      document.getElementById("btnPrev").disabled = state.current === 0;
+      document.getElementById("btnNext").classList.toggle("hidden", state.current === questions.length - 1);
+      document.getElementById("btnFinish").classList.toggle("hidden", state.current !== questions.length - 1);
+    }
+
+    function calculerNote(pourcentage) {
+      return (1 + (pourcentage / 100) * 5).toFixed(1);
+    }
+
+    function finishExam() {
+      saveCurrentAnswer();
+
+      const unanswered = state.answers.filter(a => a === null).length;
+      if (unanswered > 0) {
+        const ok = confirm(`Il reste ${unanswered} réponse(s) vide(s). Veux-tu quand même valider ?`);
+        if (!ok) return;
+      }
+
+      const detailed = questions.map((q, i) => {
+        const userAnswer = state.answers[i];
+        const correct = userAnswer === q.answer;
+        return {
+          numero: i + 1,
+          type: labelType(q.type),
+          question: q.prompt,
+          reponseEleve: formatUserAnswer(q, userAnswer),
+          juste: correct,
+          explication: q.explanation
+        };
+      });
+
+      const score = detailed.filter(item => item.juste).length;
+      const pourcentage = Math.round((score / questions.length) * 100);
+      const note = calculerNote(pourcentage);
+
+      const payload = {
+        eleve: state.profile,
+        score,
+        total: questions.length,
+        pourcentage,
+        note,
+        dateSoumission: new Date().toISOString(),
+        reponses: detailed
+      };
+
+      renderResults(payload);
+      showScreen("result");
+      sendResults(payload);
+    }
+
+    function formatUserAnswer(question, userAnswer) {
+      if (userAnswer === null || userAnswer === undefined) return "Aucune réponse";
+      return question.options[userAnswer] ?? "Aucune réponse";
+    }
+
+    function renderResults(payload) {
+      document.getElementById("finalName").innerHTML = `<strong>${escapeHtml(payload.eleve.nom)}</strong>`;
+      document.getElementById("finalScore").textContent = `${payload.score} / ${payload.total}`;
+      document.getElementById("finalMessage").textContent = `Pourcentage : ${payload.pourcentage}% | Note : ${payload.note}`;
+      document.getElementById("sendStatus").textContent = WEBHOOK_URL
+        ? "Envoi du résultat en cours..."
+        : "Aucun webhook n’est configuré. Le plus simple est d’utiliser un Google Sheet comme tableau automatique, puis d’exporter ce tableau en Excel (.xlsx).";
+
+      const resultList = document.getElementById("resultList");
+      resultList.innerHTML = payload.reponses.map(item => `
+        <div class="result-item">
+          <strong>Question ${item.numero}</strong> – ${item.type}<br />
+          <div>${escapeHtml(item.question)}</div>
+          <div class="small"><strong>Réponse donnée :</strong> ${escapeHtml(item.reponseEleve)}</div>
+          <div class="small"><strong>Résultat :</strong> ${item.juste ? "Juste" : "Faux"}</div>
+          <div class="small muted"><strong>Rappel :</strong> ${escapeHtml(item.explication)}</div>
+        </div>
+      `).join("");
+    }
+
+    async function sendResults(payload) {
+      const status = document.getElementById("sendStatus");
+
+      if (!WEBHOOK_URL) {
+        status.textContent = "Aucun webhook n’est configuré. Le plus simple est d’utiliser un Google Sheet comme tableau automatique, puis d’exporter ce tableau en Excel (.xlsx).";
+        return;
+      }
+
+      try {
+        const response = await fetch(WEBHOOK_URL, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload)
+        });
+
+        if (!response.ok) {
+          throw new Error("Erreur réseau lors de l’envoi");
+        }
+
+        status.textContent = "Résultat envoyé avec succès.";
+      } catch (error) {
+        console.error(error);
+        status.textContent = "Le score a été calculé, mais l’envoi automatique a échoué. Vérifie l’URL du webhook.";
+      }
+    }
+
+    function restartExam() {
+      state.current = 0;
+      state.answers = Array(questions.length).fill(null);
+      state.profile = null;
+      document.getElementById("nom").value = "";
+      showScreen("home");
+    }
+
+    function escapeHtml(str) {
+      return String(str)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/\"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
+  </script>
+</body>
+</html>
